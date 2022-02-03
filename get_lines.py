@@ -1,8 +1,8 @@
 import sys
 from io import BytesIO
+from geo import get_spn
 import requests
 from PIL import Image
-from geo import get_spn
 
 toponym_to_find = " ".join(sys.argv[1:])
 
@@ -17,18 +17,19 @@ response = requests.get(geocoder_api_server, params=geocoder_params)
 
 if not response:
     pass
+
 json_response = response.json()
 toponym = json_response["response"]["GeoObjectCollection"][
     "featureMember"][0]["GeoObject"]
-
 toponym_coodrinates = toponym["Point"]["pos"]
-
 toponym_longitude, toponym_lattitude = toponym_coodrinates.split(" ")
+
 
 map_params = {
     "ll": ",".join([toponym_longitude, toponym_lattitude]),
     "spn": ",".join(map(str, get_spn(toponym))),
-    "l": "map"
+    "l": "map",
+    'pt': f'{toponym_longitude}, {toponym_lattitude},vkbk'
 }
 
 map_api_server = "http://static-maps.yandex.ru/1.x/"
